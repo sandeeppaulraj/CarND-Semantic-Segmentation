@@ -58,8 +58,47 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :param num_classes: Number of classes to classify
     :return: The Tensor for the last layer of output
     """
-    # TODO: Implement function
-    return None
+    std_dev = 0.001
+    reg = 0.0001
+
+    # 1x1 Convolutions
+
+    conx_1x1_layer3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1,
+                                       kernel_initializer = tf.random_normal_initializer(stddev = std_dev),
+                                       kernel_regularizer = tf.contrib.layers.l2_regularizer(reg),
+                                       name = "conx_1x1_layer3")
+
+    conx_1x1_layer4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1,
+                                       kernel_initializer = tf.random_normal_initializer(stddev = std_dev),
+                                       kernel_regularizer = tf.contrib.layers.l2_regularizer(reg),
+                                       name = "conx_1x1_layer4")
+
+    conx_1x1_layer7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1,
+                                       kernel_initializer = tf.random_normal_initializer(stddev = std_dev),
+                                       kernel_regularizer = tf.contrib.layers.l2_regularizer(reg),
+                                       name = "conx_1x1_layer7")
+
+    upsample_2x_l7 = tf.layers.conv2d_transpose(vgg_layer7_out, num_classes, 4, strides = (2, 2),
+                                       kernel_initializer = tf.random_normal_initializer(stddev = std_dev),
+                                       kernel_regularizer = tf.contrib.layers.l2_regularizer(reg),
+                                       name = "upsample_2x_l7")
+
+    fuse1 = tf.add(upsample_2x_l7, conx_1x1_layer4)
+
+    upsample_2x_f1 = tf.layers.conv2d_transpose(fuse1, num_classes, 4, strides = (2, 2),
+                                       kernel_initializer = tf.random_normal_initializer(stddev = std_dev),
+                                       kernel_regularizer = tf.contrib.layers.l2_regularizer(reg),
+                                       name = "upsample_2x_f1")
+
+    fuse2 = tf.add(upsample_2x_f1, conx_1x1_layer3)
+
+    upsample_2x_f2 = tf.layers.conv2d_transpose(fuse2, num_classes, 16, strides = (8, 8),
+                                       kernel_initializer = tf.random_normal_initializer(stddev = std_dev),
+                                       kernel_regularizer = tf.contrib.layers.l2_regularizer(reg),
+                                       name = "upsample_2x_f2")
+
+    return upsample_2x_f2
+
 tests.test_layers(layers)
 
 
