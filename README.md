@@ -2,6 +2,8 @@
 ### Introduction
 In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
 
+![Semantic Segmentation Output](https://github.com/sandeeppaulraj/CarND-Semantic-Segmentation/blob/master/ss_video.gif)
+
 ### Setup
 ##### GPU
 `main.py` will check to make sure you are using GPU - if you don't have a GPU on your system, you can use AWS or another cloud computing platform.
